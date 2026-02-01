@@ -18,7 +18,7 @@ Currently, I live with my girlfriend and we struggle to keep track of if the ani
     1. If done online, conffetti will appear on screen.
     2. If done on the physical list, a sliding door on the board will move from "not done" to "done"
 
-## Data Model and Architecture
+## Basic Model
 Physical Board Model:
 ![Image of Physcial Board Model](docs/ProjectDesignDiagrams/PhysicalBoardDesign.png)
 

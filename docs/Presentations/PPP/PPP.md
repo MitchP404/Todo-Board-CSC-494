@@ -35,7 +35,7 @@ This project is meant to produce a To-Do list that can be updated on the go via 
 
 ---
 
-## Data Model and Architecture
+## Basic Model
 ![width:1000em](../../ProjectDesignDiagrams/PhysicalBoardDesign.png)
 
 ---
