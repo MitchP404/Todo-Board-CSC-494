@@ -52,3 +52,9 @@ This project is meant to produce a To-Do list that can be updated on the go via 
     2. Do the physical board's doors slide back at the set time each day?
     3. Does the web application reset at the set time?
 5. Does the list feel satisfying to use? Do events take place that makes completing a task feel more fun to me on both the web application and physical board?
+
+---
+
+## AI Learning Goals
+- Use AI to learn how to set up a Docker container running a web application
+- Use AI to learn how to create a sliding door mechanism with a motor controlled by an arduino board.
