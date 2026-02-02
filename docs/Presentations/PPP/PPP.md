@@ -58,3 +58,15 @@ This project is meant to produce a To-Do list that can be updated on the go via 
 ## AI Learning Goals
 - Use AI to learn how to set up a Docker container running a web application
 - Use AI to learn how to create a sliding door mechanism with a motor controlled by an arduino board.
+
+---
+
+## Sprint 1 Goals
+- Create an MVP of the web application, without any communication to a physical board
+- Create a prototype of a single To-Do list item with a button and sliding door
+
+---
+
+## Sprint 2 Goals
+- Create the full To-Do list board with multiple items
+- Implement communication from the board to the web server
