@@ -70,3 +70,10 @@ This project is meant to produce a To-Do list that can be updated on the go via 
 ## Sprint 2 Goals
 - Create the full To-Do list board with multiple items
 - Implement communication from the board to the web server
+
+---
+
+## Current Risks and Unknowns
+- What kind of motor to use?
+- How to properly power the system (without starting a fire preferably)?
+- How to keep the web application secure?
