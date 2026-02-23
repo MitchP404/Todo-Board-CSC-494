@@ -6,7 +6,7 @@ import express from 'express';
 import { WebSocket, WebSocketServer } from 'ws';
 
 const app = express(); //Initialize an express server
-const port = process.env.PORT || 3000; // Use either the PORT environment variable or port 3000
+const port = /*process.env.PORT ||*/ 3000; // Use either the PORT environment variable or port 3000
 
 // Error handler for errors that occur when HTTP server is handling issue
 function onSocketPreError(e) {

@@ -1,0 +1,15 @@
+{
+    "name":"node-docker-test",
+    "private": true,
+    "license": "UNLICENSED",
+    "version": "0.1.0",
+    "description": "A test package to run a node.js server in a docker container",
+    "main": "code/server.js", 
+    "scripts": {
+        "start": "node code/server.js"
+    },
+    "dependencies": {
+        "express": "latest",
+        "ws": "latest"
+    }
+}
