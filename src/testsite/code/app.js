@@ -1,12 +1,12 @@
 (function () {
-    let ws : WebSocket; //Our WebSocket connection to the server
-    const messages = <HTMLElement>document.getElementById('messages');
-    const wsOpen = <HTMLButtonElement>document.getElementById('ws-open');
-    const wsClose = <HTMLButtonElement>document.getElementById('ws-close');
-    const wsSend = <HTMLButtonElement>document.getElementById('ws-send');
-    const wsInput = <HTMLButtonElement>document.getElementById('ws-input');
+    let ws; //Our WebSocket connection to the server
+    const messages = document.getElementById('messages');
+    const wsOpen = document.getElementById('ws-open');
+    const wsClose = document.getElementById('ws-close');
+    const wsSend = document.getElementById('ws-send');
+    const wsInput = document.getElementById('ws-input');
 
-    function showMessage(message : string) {
+    function showMessage(message) {
         if(!messages) {
             return;
         }
@@ -37,7 +37,7 @@
             showMessage('WebSocket connection closed');
         });
 
-        ws.addEventListener('message', (msg: MessageEvent<string>) => {
+        ws.addEventListener('message', (msg) => {
             showMessage(`Received message: ${msg.data}`);
         });
 
