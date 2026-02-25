@@ -11,8 +11,8 @@ services:
     image: nginx:latest
     container_name: website
     volumes: 
-      - "./testsite/code:/usr/share/nginx/html"
-      - "./testsite/nginx.conf:/etc/nginx/conf.d/default.conf"
+      - "./website/code:/usr/share/nginx/html"
+      - "./website/nginx.conf:/etc/nginx/conf.d/default.conf"
     ports:
       - 80:80
     restart: always
@@ -21,7 +21,7 @@ services:
       context: /testserver
     container_name: server
     #volumes:
-      #- "./testserver/package.json:package.json"
-      #- "./testserver/code:/app"
+      #- "./nodeserver/package.json:package.json"
+      #- "./nodeserver/code:/app"
     ports:
       - "3000:3000"
