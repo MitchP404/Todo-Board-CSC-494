@@ -4,21 +4,14 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Web Socket Test</title>
+        <title>To-Do Board</title>
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <h1>Test:</h1>
-        <button id="ws-close">
-            Close Connection
-        </button>
-        <div class="input-block">
-            <input type="text" id="ws-input">
-            <button id="ws-send">
-                Send message
-            </button>
+        <h1>To-Do Board</h1>
+        <div id="boards">
+            <p id="loadMsg">Loading content...</p>
         </div>
-        <pre id="messages"></pre>
         <script src="app.js"></script>
     </body>
 </html>
