@@ -2,7 +2,7 @@
 # This builds two containers: One for a node.js server and one for a
 #   nginx website that can connect to the node.js servers using websockets.
 # Navigate to this file and use this command to run the containers:
-#   docker-compose up -d --build --force-restart
+#   docker-compose up -d --build --force-recreate
 # Use this command to stop them:
 #   docker-compose down
 
