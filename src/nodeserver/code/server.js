@@ -57,11 +57,15 @@ wss.on('connection', (ws, req) => {
 
     //Set what to do when a message is received
     ws.on('message', (msg, isBinary) => {
+        console.log(msg);
+
+        /*
         wss.clients.forEach((client) => {
             if(client.readyState === WebSocket.OPEN) {
                 client.send(msg, { binary: isBinary });
             }
         });
+        */
     });
 
     ws.on('close', () => {
