@@ -18,7 +18,7 @@ services:
     restart: always
   server:
     build:
-      context: /testserver
+      context: /nodeserver
     container_name: server
     #volumes:
       #- "./nodeserver/package.json:package.json"
