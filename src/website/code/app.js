@@ -25,20 +25,23 @@ class BoardItem {
     }
 
     // Update whether or not this item is complete
-    updateStatus = function(complete) {
+    updateStatus(complete) {
         this.complete = complete;
-        console.log(`Item ${1} status: ${complete}`)
+        console.log(`Item ${this.id} status: ${complete}`);
     }
 
     // Add event listeners to the radio buttons
     createListeners(){
-        document.getElementById(`done${this.id}`).addEventListener("change", function() {
-            updateStatus(this.value);
-        })
+        console.log(`Adding listeners to ${this.id}`);
+        let item = document.getElementById(`done${this.id}`);
+        console.log(item);
+        item.addEventListener("change", () => {
+            this.updateStatus(true);
+        });
         
-        document.getElementById(`notdone${this.id}`).addEventListener("change", function() {
-            updateStatus(this.value);
-        })
+        document.getElementById(`notdone${this.id}`).addEventListener("change", () => {
+            this.updateStatus(false);
+        });
     }
 
     //Convert the contents of this item to a JSON string
@@ -69,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //Make the board items
     boardsHTML = document.getElementById('boards');
-    const itemCount = 7;
+    const itemCount = 3;
     
     //An array contianing the items on the board
     items = Array(itemCount);
@@ -78,7 +81,10 @@ document.addEventListener('DOMContentLoaded', function() {
         //Initialize each board item
         //TODO: This needs to come from the web socket server
         items[i] = new BoardItem(i+1, "Name", false);
-        boardsHTML.innerHTML += `<div id = slot${1}>${items[i].toHTML()}</div>`;
+        boardsHTML.innerHTML += `<div id = slot${i}>${items[i].toHTML()}</div>`;
+    }
+
+    for(i = 0; i < itemCount; i++) {
         items[i].createListeners();
     }
 
