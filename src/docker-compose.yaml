@@ -7,6 +7,7 @@
 #   docker-compose down
 
 services:
+  #The website itself
   website:
     image: nginx:latest
     container_name: website
@@ -16,6 +17,7 @@ services:
     ports:
       - 80:80
     restart: always
+  #The Node.JS server connecting the website to the database
   server:
     build:
       context: /nodeserver
@@ -25,3 +27,19 @@ services:
       #- "./nodeserver/code:/app"
     ports:
       - "3000:3000"
+    restart: always
+  #The database that stores everything
+  # Use this command to log in once inside the container:
+  #   mysql --user=root --password
+  # Once properly set up, use the information in docs/DatabaseDesign.md
+  #   initialize the database
+  db:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: testytests
+    ports:
+      - "3306:3306"
+    volumes:
+      # Make MySql write to the computer
+      - "./mysqldatabase/data:/var/lib/mysql"
