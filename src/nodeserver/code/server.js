@@ -2,8 +2,8 @@
     The express server that produces the todo list 
 */
 
-import express from 'express';
-import { WebSocket, WebSocketServer } from 'ws';
+const express = require('express');
+const { WebSocket, WebSocketServer } = require('ws');
 
 const app = express(); //Initialize an express server
 const port = /*process.env.PORT ||*/ 3000; // Use either the PORT environment variable or port 3000
