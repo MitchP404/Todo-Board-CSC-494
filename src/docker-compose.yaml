@@ -12,8 +12,8 @@ services:
     image: nginx:latest
     container_name: website
     volumes: 
-      - "./website/code:/usr/share/nginx/html"
-      - "./website/nginx.conf:/etc/nginx/conf.d/default.conf"
+      - "./website/code:/usr/share/nginx/html:ro"
+      - "./website/nginx.conf:/etc/nginx/conf.d/default.conf:ro"
     ports:
       - 80:80
     restart: always
@@ -22,12 +22,15 @@ services:
     build:
       context: /nodeserver
     container_name: server
-    #volumes:
-      #- "./nodeserver/package.json:package.json"
-      #- "./nodeserver/code:/app"
+    volumes:
+      - "./nodeserver/package.json:/app/package.json:ro"
+      - "./nodeserver/code:/app/code:ro"
     ports:
       - "3000:3000"
     restart: always
+    depends_on:
+      db:
+        condition: service_healthy
   #The database that stores everything
   # Use this command to log in once inside the container:
   #   mysql --user=root --password
@@ -43,3 +46,11 @@ services:
     volumes:
       # Make MySql write to the computer
       - "./mysqldatabase/data:/var/lib/mysql"
+    #Check to make sure the database is accepting connections every so often
+    healthcheck:
+      #test: ["CMD", "mysqladmin", "ping", "-h", "localhost", '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD']
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      start_period: 30s
+      start_interval: 5s

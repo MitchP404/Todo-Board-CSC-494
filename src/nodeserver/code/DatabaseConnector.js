@@ -17,7 +17,8 @@ class DatabaseConnetor {
     // Returns a promise with resolve() and reject(error)
     connect() {
         this.connection = mysql.createConnection({
-            host: this.ipAddress + ":" + this.port,
+            host: this.ipAddress,
+            port: this.port,
             user: this.user,
             password: this.password,
             database: this.databaseName
@@ -29,7 +30,6 @@ class DatabaseConnetor {
                     reject(error);
                     return;
                 }
-                console.log("Connected to Database with thread id " + this.connection.threadId);
                 resolve();
             });
         });
@@ -105,3 +105,5 @@ class DatabaseConnetor {
         this.connection.end();
     }
 }
+
+module.exports = DatabaseConnetor;
