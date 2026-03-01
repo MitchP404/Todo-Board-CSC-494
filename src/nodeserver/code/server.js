@@ -111,6 +111,8 @@ function runServer() {
                 m = new Message(ws, ServerMessages.SENDALL, results, (error) => {
                     if(!!error) {
                         console.log(error);
+                    } else {
+                        console.log("Items sent.");
                     }
                 });
                 m.send();
