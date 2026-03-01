@@ -50,14 +50,6 @@ class BoardItem {
     }
 };
 
-function showMessage(message) {
-    if(!messages) {
-        return;
-    }
-    messages.textContent += `\n${message}`;
-    messages.scrollTop = messages.scrollHeight;
-}
-
 function closeConnection() {
     if(!!ws) {
         ws.close();

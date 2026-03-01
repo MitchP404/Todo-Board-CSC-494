@@ -18,7 +18,7 @@ const ClientMessages = Object.freeze({
 // The Messages themselves
 class Message {
     constructor(ws, type, body, callback) {
-        this.ws;
+        this.ws = ws;
         this.type = type;
         this.body = body;
         this.callback = callback;

@@ -5,19 +5,26 @@
 const DatabaseConnector = require('./DatabaseConnector.js');
 const express = require('express');
 const { WebSocket, WebSocketServer } = require('ws');
+const { ServerMessages, ClientMessages, Message } = require('./Message.js');
 
 const app = express(); //Initialize an express server
 const port = /*process.env.PORT ||*/ 3000; // Use either the PORT environment variable or port 3000
 
 // Error handler for errors that occur when HTTP server is handling issue (pre-upgrade)
 function onSocketPreError(e) {
-    console.log(e);
+    console.error(e);
 }
 
 // Error handler for errors that occur when wss is handling issue (post-upgrade)
 function onSocketPostError(e) {
-    console.log(e);
+    console.error(e);
 }
+
+// Make sure web socket connection hasn't dropped
+//TODO: Implement fully
+//function heartbeat() {
+//    this.isAlive = true;
+//}
 
 // The IP address of the database
 const dbIP = "db";
@@ -101,7 +108,12 @@ function runServer() {
             //Resolve
             (results) => {
                 console.log("Items obtained, sending...");
-                ws.emit(JSON.stringify(results));
+                m = new Message(ws, ServerMessages.SENDALL, results, (error) => {
+                    if(!!error) {
+                        console.log(error);
+                    }
+                });
+                m.send();
             },
             //Reject
             (error) => {
@@ -110,8 +122,15 @@ function runServer() {
             }
         );
 
+        //Set that the socket is active and to keep it active if a pong is received
+        //TODO: Uncomment to test, alongside other related code
+        //ws.isAlive = true;
+        //ws.on('pong', heartbeat);
+
         //Set what to do when a message is received
         ws.on('message', (msg, isBinary) => {
+            //TODO: Implement fully. Redo ifs to use message types
+            /*
             console.log('Message received: ' + msg);
             msgContent = JSON.parse(msg);
             
@@ -129,6 +148,7 @@ function runServer() {
             else if(msgContent.command == "remove") {
 
             }
+            */
 
             //Example of how to send data to each open client
             /*
@@ -144,4 +164,17 @@ function runServer() {
             console.log('Connection Closed');
         });
     });
+
+    // Regularly check if the sockets are still alive
+    //TODO: Uncomment to test, alongside other related code
+    /*
+    const interval = setInterval(function ping() {
+        wss.clients.forEach(function each(ws) {
+            if (ws.isAlive === false) return ws.terminate();
+
+            ws.isAlive = false;
+            ws.ping();
+        });
+    }, 30000);
+    */
 }
