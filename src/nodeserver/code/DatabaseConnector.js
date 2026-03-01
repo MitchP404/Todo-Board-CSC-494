@@ -2,7 +2,7 @@
     A class representing a connection to the database
 */
 
-const mysql = require('mysql')
+const mysql = require('mysql2')
 
 class DatabaseConnetor {
     constructor(ipAddress, port, user, password, databaseName) {
