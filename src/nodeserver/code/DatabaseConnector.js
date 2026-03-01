@@ -106,4 +106,4 @@ class DatabaseConnetor {
     }
 }
 
-module.exports = DatabaseConnetor;
+module.exports = DatabaseConnector;
