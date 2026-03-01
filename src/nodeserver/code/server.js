@@ -20,7 +20,7 @@ function onSocketPostError(e) {
 }
 
 // The IP address of the database
-const dbIP = "127.0.0.1";
+const dbIP = "db";
 
 // The port used to access the database
 const dbPort = 3306;
@@ -97,8 +97,18 @@ function runServer() {
         ws.on('error', onSocketPostError);
 
         // Send the item list to the endpoint
-        //TODO
-        // DatabaseConnector.
+        dbc.getItems().then(
+            //Resolve
+            (results) => {
+                console.log("Items obtained, sending...");
+                ws.emit(JSON.stringify(results));
+            },
+            //Reject
+            (error) => {
+                console.error("Could not obtain items: " + error.stack);
+                ws.emit("ITEM RETRIEVAL ERROR");
+            }
+        );
 
         //Set what to do when a message is received
         ws.on('message', (msg, isBinary) => {
