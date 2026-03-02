@@ -4,42 +4,55 @@ let ws; //Our WebSocket connection to the server
 // A single item on the board
 class BoardItem {
 
-    // id: The id of this item. Must be value 1-7. Also serves as the array index + 1
+    // id: The sql id of this item.
     // name: The name of the item
     // status: Whether or not the item is completed.TRUE if yes. 
-    constructor(id, name, complete) {
+    // num: The order number of this item on this webpage
+    constructor(id, name, complete, num) {
         this.id = id;
         this.name = name;
         this.complete = complete;
+        this.num = num;
     }
 
     // Create HTML content for this object
     toHTML = function() {
-        return `<h2>#${this.id}: ${this.name}</h2>
+        return `<div id = item${this.id}>
+        <h2>#${this.num}: ${this.name}</h2>
         <label for="done${this.id}">Done</label>
         <input type="radio" id=done${this.id} name="complete${this.id}" value="true">
         
         <label for="notdone${this.id}">Not Done</label>
         <input type="radio" id=notdone${this.id} name="complete${this.id}" value="false">
+        </div>
         `
     }
 
     // Update whether or not this item is complete
     updateStatus(complete) {
-        this.complete = complete;
-        console.log(`Item ${this.id} status: ${complete}`);
+        console.log(`Updating item ${this.id} status: ${complete}. Sending message...`);
+        //ws.send()
     }
 
-    // Add event listeners to the radio buttons
-    createListeners(){
-        console.log(`Adding listeners to ${this.id}`);
-        let item = document.getElementById(`done${this.id}`);
-        console.log(item);
-        item.addEventListener("change", () => {
+    // Setup the buttons on a newly created BoardItem with its HTML already in the webpage
+    setupButtons(){
+
+        let doneButton = document.getElementById(`done${this.id}`);
+        let notDoneButton = document.getElementById(`notdone${this.id}`)
+
+        // Set the buttons based on whether the task is done
+        if(this.complete) {
+            doneButton.checked = true;
+        } else {
+            notDoneButton.checked = true;
+        }
+
+        // Add event listeners to the buttons
+        doneButton.addEventListener("change", () => {
             this.updateStatus(true);
         });
         
-        document.getElementById(`notdone${this.id}`).addEventListener("change", () => {
+        notDoneButton.addEventListener("change", () => {
             this.updateStatus(false);
         });
     }
@@ -60,25 +73,10 @@ document.addEventListener('DOMContentLoaded', function() {
     closeConnection();
 
     //Attempt to create the connection
-    ws = new WebSocket('ws://localhost:3000');
-
-    //Make the board items
-    boardsHTML = document.getElementById('boards');
-    const itemCount = 3;
+    var ws = new WebSocket('ws://localhost:3000');
     
-    //An array contianing the items on the board
-    items = Array(itemCount);
-
-    for(i = 0; i < itemCount; i++) {
-        //Initialize each board item
-        //TODO: This needs to come from the web socket server
-        items[i] = new BoardItem(i+1, "Name", false);
-        boardsHTML.innerHTML += `<div id = slot${i}>${items[i].toHTML()}</div>`;
-    }
-
-    for(i = 0; i < itemCount; i++) {
-        items[i].createListeners();
-    }
+    //An array containing the items on the board
+    let items = [];
 
     ws.addEventListener('error', () => {
         console.log('WebSocket error');
@@ -94,7 +92,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
     ws.addEventListener('message', (msg) => {
         console.log(`Received message: ${msg.data}`);
-    });
+        m = JSON.parse(msg.data);
+        let boardsHTML = document.getElementById('boards');
+        switch(m.type){
+            case 1:
+                // Message contains all active items.
+                // Reset the items array to be these
+                items = [];
+                for(i = 0; i < m.body.length; i++) {
+                    items.push(new BoardItem(m.body[i].id, m.body[i].name, m.body[i].status, i+1));
+                }
+                
+                //Create the site based on the contents of the items array
+                boardsHTML.innerHTML = '';
+                for(i = 0; i < items.length; i++) {
+                    //Initialize each board item
+                    boardsHTML.innerHTML += `<div id = item${items[i].id}>${items[i].toHTML()}</div>`;
+                }
 
-    document.getElementById("loadMsg").innerHTML = "";
+                //Add all event handlers for buttons
+                for(i = 0; i < items.length; i++) {
+                    items[i].setupButtons();
+                }
+
+                document.getElementById("loadMsg").innerHTML = "";
+                break;
+            //Errors
+            case 101:
+                // Initial setup failed
+                boardsHTML.innerHTML = '<p class = setup_error>An internal error has prevented retrieving the To-Do list items.</p>';
+                document.getElementById("loadMsg").innerHTML = "";
+                break;
+                
+            default:
+                console.error("UNRECOGNIZED WEBSOCKET MESSAGE TYPE");
+                break;
+
+        }
+    });
 });

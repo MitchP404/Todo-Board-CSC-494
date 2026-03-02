@@ -4,8 +4,11 @@
 
 // Types for messages sent from the server
 const ServerMessages = Object.freeze({
-    SENDALL: 1 //Send all items, body contains an array of ToDoItems with 'id', 'status', and 'name'
+    SENDALL: 1, //Send all items, body contains an array of ToDoItems with 'id', 'status', and 'name'
+    UPDATE_ITEM: 2, //Update a single item's status, body contains a ToDoItem with 'id' and 'status'
 
+    //Errors
+    ERR_SETUP_RETRIEVAL: 101 //Error getting all items for initial setup
 });
 
 // Types for messages sent from the client
