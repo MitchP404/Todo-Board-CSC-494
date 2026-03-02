@@ -159,18 +159,19 @@ function runServer() {
                         }
                     );
                     break;
+                case ClientMessages.CREATE:
+                    console.log(`Creating item ${m.body.name}`);
+                    //TODO: Implement
+                    //dbc.newItem()
+                    break;
+                case ClientMessages.DELETE:
+                    console.log(`Deleting item ${m.data.id}`);
+                    //TODO: Implement
+                    break;
                 default:
                     console.error("UNRECOGNIZED WEBSOCKET MESSAGE TYPE");
                     break;
             }
-            //Example of how to send data to each open client
-            /*
-            wss.clients.forEach((client) => {
-                if(client.readyState === WebSocket.OPEN) {
-                    client.send(msg, { binary: isBinary });
-                }
-            });
-            */
         });
 
         ws.on('close', () => {

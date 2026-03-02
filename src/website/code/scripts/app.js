@@ -84,10 +84,40 @@ class BoardItem {
     }
 };
 
+// End the connection to the web socket server
 function closeConnection() {
     if(!!ws) {
         ws.close();
     }
+}
+
+// Make a new item and send it to the server
+function createNew() {
+    let name = prompt("Name of the new task: ");
+    sendMessage(ws, ClientMessages.CREATE, {name: name}).then(
+        //Resolve
+        () => {
+            console.log('Creation request sent: ' + name);
+        },
+        //Reject
+        (error,msg) => {
+            console.error('Could not send create request: ' + msg + '\n' + error.stack);
+        }
+    );
+}
+
+// Send a request to the server to delete a ToDoItem
+function deleteItem(id) {
+    sendMessage(ws, ClientMessages.DELETE, {id: id}).then(
+        //Resolve
+        () => {
+            console.log('Delete request sent: ' + id);
+        },
+        //Reject
+        (error,msg) => {
+            console.error('Could not send delete request: ' + msg + '\n' + error.stack);
+        }
+    );
 }
 
 document.addEventListener('DOMContentLoaded', function() {

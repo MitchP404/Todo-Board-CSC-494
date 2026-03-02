@@ -9,7 +9,9 @@ export const ServerMessages = Object.freeze({
 
     //Errors
     ERR_SETUP_RETRIEVAL: 101, //Error getting all items for initial setup
-    ERR_UPDATE_RETRIEVAL: 102 //Error updating an item
+    ERR_UPDATE_RETRIEVAL: 102, //Error updating an item
+    ERR_CREATION: 103, //Error creating a new item due to a database error
+    ERR_DELETION: 104 //Error removing a ToDoItem
 });
 
 // Types for messages sent from the client
