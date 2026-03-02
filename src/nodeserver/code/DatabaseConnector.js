@@ -67,6 +67,7 @@ class DatabaseConnector {
     // Returns a promise with resolve(results) and reject(error, isCapacity)
     // isCapacity is true if the error was caused by not having room
     newItem(name) {
+        
         return new Promise((resolve, reject) => {
             this.connection.query('UPDATE ToDoItems SET name = ?, active_time = NOW() WHERE id = (SELECT min_id FROM (SELECT MIN(id) AS min_id FROM ToDoItems WHERE active_time IS NULL) AS derived_table);', [name], (error, results) => {
                 if(error) {
