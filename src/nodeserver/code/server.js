@@ -5,7 +5,7 @@
 const DatabaseConnector = require('./DatabaseConnector.js');
 const express = require('express');
 const { WebSocket, WebSocketServer } = require('ws');
-const { ServerMessages, ClientMessages, Message } = require('./Message.js');
+const { ServerMessages, ClientMessages, Message } = require('../../common/Message.js');
 
 const app = express(); //Initialize an express server
 const port = /*process.env.PORT ||*/ 3000; // Use either the PORT environment variable or port 3000
@@ -131,27 +131,23 @@ function runServer() {
 
         //Set what to do when a message is received
         ws.on('message', (msg, isBinary) => {
-            //TODO: Implement fully. Redo ifs to use message types
             /*
-            console.log('Message received: ' + msg);
-            msgContent = JSON.parse(msg);
-            
-            // Create To-Do item command
-            if(msgContent.command == "create") {
-
-            }
-
-            // Update To-Do item command
-            else if(msgContent.command == "update") {
-
-            }
-
-            // Remove To-Do item command 
-            else if(msgContent.command == "remove") {
-
-            }
+            console.log(`Received message: ${msg.data}`);
+            let m = JSON.parse(msg.data); //The contents of the message
+            let boardsHTML = document.getElementById('boards'); //The item on the page where the to do items are located
+            switch(m.type){
+                case ClientMessages.UPDATE:
+                    
+                    break;
+                //Errors
+                case ServerMessages.ERR_SETUP_RETRIEVAL:
+                    
+                    break;
+                    
+                default:
+                    console.error("UNRECOGNIZED WEBSOCKET MESSAGE TYPE");
+                    break;
             */
-
             //Example of how to send data to each open client
             /*
             wss.clients.forEach((client) => {

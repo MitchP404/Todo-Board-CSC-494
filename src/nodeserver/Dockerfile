@@ -11,8 +11,9 @@ COPY package.json package.json
 # Install all depndencies from package.json
 RUN npm install
 
+# The rest of the code should be imported with a volume
 # Move the code into the container
-COPY /code ./code
+# COPY /code ./code
 
 # Run the server
 CMD [ "npm", "start" ]

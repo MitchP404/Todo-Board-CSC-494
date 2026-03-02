@@ -1,3 +1,4 @@
+import { ServerMessages, ClientMessages, Message } from "../common/Message.js"
 
 let ws; //Our WebSocket connection to the server
 
@@ -31,7 +32,14 @@ class BoardItem {
     // Update whether or not this item is complete
     updateStatus(complete) {
         console.log(`Updating item ${this.id} status: ${complete}. Sending message...`);
-        //ws.send()
+        m = new Message(ws, ServerMessages.SENDALL, results, (error) => {
+                if(!!error) {
+                    console.error(error);
+                } else {
+                    console.log("Update message sent");
+                }
+        });
+        m.send();
     }
 
     // Setup the buttons on a newly created BoardItem with its HTML already in the webpage
@@ -92,33 +100,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
     ws.addEventListener('message', (msg) => {
         console.log(`Received message: ${msg.data}`);
-        m = JSON.parse(msg.data);
-        let boardsHTML = document.getElementById('boards');
+        let m = JSON.parse(msg.data); //The contents of the message
+        let boardsHTML = document.getElementById('boards'); //The item on the page where the to do items are located
         switch(m.type){
-            case 1:
+            case ServerMessages.SENDALL:
                 // Message contains all active items.
                 // Reset the items array to be these
                 items = [];
-                for(i = 0; i < m.body.length; i++) {
+                for(let i = 0; i < m.body.length; i++) {
                     items.push(new BoardItem(m.body[i].id, m.body[i].name, m.body[i].status, i+1));
                 }
                 
                 //Create the site based on the contents of the items array
                 boardsHTML.innerHTML = '';
-                for(i = 0; i < items.length; i++) {
+                for(let i = 0; i < items.length; i++) {
                     //Initialize each board item
                     boardsHTML.innerHTML += `<div id = item${items[i].id}>${items[i].toHTML()}</div>`;
                 }
 
                 //Add all event handlers for buttons
-                for(i = 0; i < items.length; i++) {
+                for(let i = 0; i < items.length; i++) {
                     items[i].setupButtons();
                 }
 
                 document.getElementById("loadMsg").innerHTML = "";
                 break;
             //Errors
-            case 101:
+            case ServerMessages.ERR_SETUP_RETRIEVAL:
                 // Initial setup failed
                 boardsHTML.innerHTML = '<p class = setup_error>An internal error has prevented retrieving the To-Do list items.</p>';
                 document.getElementById("loadMsg").innerHTML = "";
