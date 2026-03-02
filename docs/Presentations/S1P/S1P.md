@@ -20,6 +20,7 @@ marp: true
 - Software side is nearly done!
     - Able to create, delete, and mark tasks as done.
     - Able to connect from another device to my computer.
+- Progress is available on my Github repository, as well as instructions for how to set this up yourself.
 
 ---
 
@@ -42,6 +43,7 @@ marp: true
 ## Moving forward
 - Make the setup more secure
     - Protect against xss attacks
+    - Alter my Docker network so I only have the ports I need open.
 - Make using the To-Do list more satisfying
     - I want to add a sliding bar to mark the item as done, and confetti to pop out after doing so.
 - Create a stationary device I can set up at home that stays connected to the list so I can quickly access it.
