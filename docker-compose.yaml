@@ -55,7 +55,7 @@ services:
       - "./src/mysqldatabase/data:/var/lib/mysql"
     #Check to make sure the database is accepting connections every so often
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD']
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD', '--silent']
       timeout: 20s
       retries: 10
       start_period: 30s
