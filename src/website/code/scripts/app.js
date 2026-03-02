@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     //Attempt to create the connection
-    ws = new WebSocket('ws://localhost:3000');
+    ws = new WebSocket(`ws://${window.location.hostname}:3000`);
 
     //An array containing the items on the board
     let items = [];
