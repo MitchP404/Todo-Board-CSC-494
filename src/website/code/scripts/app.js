@@ -101,6 +101,7 @@ function createNew() {
         //Reject
         (error,msg) => {
             console.error('Could not send create request: ' + msg + '\n' + error.stack);
+            connectionError();
         }
     );
 }
@@ -183,6 +184,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     boardsHTML.innerHTML += items[i].toHTML();
                 }
 
+                //Add a 'new item' button
+                boardsHTML.innerHTML += `<button id=newButton>New Item</button>`
+
+                document.getElementById('newButton').addEventListener('click', createNew);
+
                 //Add all event handlers for buttons
                 for(let i = 0; i < items.length; i++) {
                     items[i].setupButtons();
@@ -209,7 +215,6 @@ document.addEventListener('DOMContentLoaded', function() {
             default:
                 console.error("UNRECOGNIZED WEBSOCKET MESSAGE TYPE");
                 break;
-
         }
     });
 });

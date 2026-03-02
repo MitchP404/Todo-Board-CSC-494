@@ -59,11 +59,19 @@ h2 {
 }
 
 .doneLabel {
-
+    cursor: pointer;
 }
 
 .notDoneLabel {
+    cursor: pointer;
+}
 
+.doneButton {
+    cursor: pointer;
+}
+
+.notDoneButton {
+    cursor: pointer;
 }
 
 #loadMsg {
@@ -72,4 +80,18 @@ h2 {
 
 .error {
     color: #CAD2C5;
+}
+
+#newButton {
+	box-shadow: 0.3125rem 0.3125rem #2F3E46;
+    border: .5rem solid #84A98C;
+    border-radius: .5rem;
+    background-color: #52796F;
+    color: #CAD2C5;
+}
+
+#newButton:hover {
+    cursor: pointer;
+    border-color: #52796F;
+    background-color: #2F3E46;
 }
