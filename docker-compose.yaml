@@ -26,7 +26,7 @@ services:
   #The Node.JS server connecting the website to the database
   server:
     build:
-      context: /src/nodeserver
+      context: ./src/nodeserver
     container_name: server
     volumes:
       - "./src/nodeserver/package.json:/app/package.json:ro"
