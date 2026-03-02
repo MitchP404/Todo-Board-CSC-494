@@ -12,23 +12,23 @@ services:
     image: nginx:latest
     container_name: website
     volumes: 
-      - "./website/code/index.html:/usr/share/nginx/html/index.html:ro"
-      - "./common/:/usr/share/nginx/html/common/:ro"
-      - "./website/code/scripts/:/usr/share/nginx/html/scripts/:ro"
-      - "./website/code/styles/:/usr/share/nginx/html/styles/:ro"
-      - "./website/nginx.conf:/etc/nginx/conf.d/default.conf:ro"
+      - "./src/website/code/index.html:/usr/share/nginx/html/index.html:ro"
+      - "./src/common/:/usr/share/nginx/html/common/:ro"
+      - "./src/website/code/scripts/:/usr/share/nginx/html/scripts/:ro"
+      - "./src/website/code/styles/:/usr/share/nginx/html/styles/:ro"
+      - "./src/website/nginx.conf:/etc/nginx/conf.d/default.conf:ro"
     ports:
       - 80:80
     restart: always
   #The Node.JS server connecting the website to the database
   server:
     build:
-      context: /nodeserver
+      context: /src/nodeserver
     container_name: server
     volumes:
-      - "./nodeserver/package.json:/app/package.json:ro"
-      - "./nodeserver/code:/app/code:ro"
-      - "./common/:/common/:ro"
+      - "./src/nodeserver/package.json:/app/package.json:ro"
+      - "./src/nodeserver/code:/app/code:ro"
+      - "./src/common/:/common/:ro"
     ports:
       - "3000:3000"
     restart: always
@@ -41,19 +41,21 @@ services:
   # Once properly set up, use the information in docs/DatabaseDesign.md
   #   initialize the database
   db:
-    image: mysql:latest
+    build: ./src/mysqldatabase
+    stdin_open: true #Keep the container's standard input open for shell prompts
+    tty: true #Set up a virtual terminal inside the container
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: testytests
+      MYSQL_DATABASE: ToDoBoardData
     ports:
       - "3306:3306"
     volumes:
       # Make MySql write to the computer
-      - "./mysqldatabase/data:/var/lib/mysql"
+      - "./src/mysqldatabase/data:/var/lib/mysql"
     #Check to make sure the database is accepting connections every so often
     healthcheck:
-      #test: ["CMD", "mysqladmin", "ping", "-h", "localhost", '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD']
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD', '--silent']
       timeout: 20s
       retries: 10
       start_period: 30s
