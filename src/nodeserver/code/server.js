@@ -10,16 +10,6 @@ const { ServerMessages, ClientMessages, sendMessage, sendMessageAll } = require(
 const app = express(); //Initialize an express server
 const port = /*process.env.PORT ||*/ 3000; // Use either the PORT environment variable or port 3000
 
-// Error handler for errors that occur when HTTP server is handling issue (pre-upgrade)
-function onSocketPreError(e) {
-    console.error(e);
-}
-
-// Error handler for errors that occur when wss is handling issue (post-upgrade)
-function onSocketPostError(e) {
-    console.error(e);
-}
-
 // Make sure web socket connection hasn't dropped
 //TODO: Implement fully
 //function heartbeat() {
@@ -44,7 +34,15 @@ const dbName = "ToDoBoardData";
 //Create object that connects back to our database container
 let dbc = new DatabaseConnector(dbIP, dbPort, dbUser, dbPassword, dbName);
 
-let connected = false;
+// Error handler for errors that occur when HTTP server is handling issue (pre-upgrade)
+function onSocketPreError(e) {
+    console.error(e);
+}
+
+// Error handler for errors that occur when wss is handling issue (post-upgrade)
+function onSocketPostError(e) {
+    console.error(e);
+}
 
 //Connect to the database
 dbc.connect().then(
@@ -161,12 +159,71 @@ function runServer() {
                     break;
                 case ClientMessages.CREATE:
                     console.log(`Creating item ${m.body.name}`);
-                    //TODO: Implement
-                    //dbc.newItem()
+                    dbc.newItem(m.body.name).then(
+                        //Resolve
+                        (results) => {
+                            console.log("Creation successful. Getting new arrays to send clients")
+                            return dbc.getItems().then(
+                                //Resolve
+                                (results) => {
+                                    console.log("Items obtained, sending...");
+                                    return sendMessageAll(wss, ServerMessages.SENDALL, results);
+                                },
+                                //Reject
+                                (error) => {
+                                    console.error("Could not obtain items: " + error.stack);
+                                    return sendMessage(ws, ServerMessages.ERR_SETUP_RETRIEVAL, {});
+                                }
+                            );
+                        },
+                        //Reject
+                        (error) => {
+                            console.error('Failure to create item.');
+                            return sendMessage(ws, ServerMessages.ERR_CREATION, {});
+                        }
+                    ).then(
+                        //Resolve
+                        () => {
+                            console.log("Creation follow-up message sent");
+                        },
+                        //Reject
+                        (error, msg) => {
+                            console.error("Failed to send creation follow-up message: " + msg + '\n' + error.stack );
+                        }
+                    );
                     break;
                 case ClientMessages.DELETE:
-                    console.log(`Deleting item ${m.data.id}`);
-                    //TODO: Implement
+                    console.log(`Deleting item ${m.body.id}`);
+                    dbc.removeItem(m.body.id).then(
+                        //Resolve
+                        (results) => {
+                            console.log("Deletion successful. Getting new arrays to send clients")
+                            return dbc.getItems().then(
+                                //Resolve
+                                (results) => {
+                                    console.log("Items obtained, sending...");
+                                    return sendMessageAll(wss, ServerMessages.SENDALL, results);
+                                },
+                                //Reject
+                                (error) => {
+                                    console.error("Could not obtain items: " + error.stack);
+                                    return sendMessage(ws, ServerMessages.ERR_SETUP_RETRIEVAL, {});
+                                }
+                            );
+                        },
+                        //Reject
+                        (error) => {
+                            console.error("Could not remove item: " + error.stack);
+                            return sendMessage(ws, ServerMessages.ERR_DELETION, {});
+                        }
+                    ).then(
+                        (results) => {
+                            console.log("Deletion follow-up send successful");
+                        },
+                        (error) => {
+                            console.error("Deletion follow-up send failed")
+                        }
+                    );
                     break;
                 default:
                     console.error("UNRECOGNIZED WEBSOCKET MESSAGE TYPE");

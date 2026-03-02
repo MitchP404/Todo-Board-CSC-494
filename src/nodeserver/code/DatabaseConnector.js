@@ -53,7 +53,7 @@ class DatabaseConnector {
     // Returns a promise with resolve(results) and reject(error)
     itemCount() {
         return new Promise((resolve, reject) => {
-            this.connection.query("SELECT COUNT(active_time) FROM ToDoItems;", (error, results) => {
+            this.connection.query("SELECT COUNT(active_time) AS count FROM ToDoItems;", (error, results) => {
                 if(error) {
                     reject(error);
                     return;
@@ -63,24 +63,59 @@ class DatabaseConnector {
         });
     }
 
-    // Make a new To-Do item by activating one of the slots
-    // Returns a promise with resolve(results) and reject(error, isCapacity)
-    // isCapacity is true if the error was caused by not having room
-    newItem(name) {
-        
+    // Get the number of inactive To-Do items (open slots)
+    // Returns a promise with resolve(results) and reject(error)
+    itemSpace() {
         return new Promise((resolve, reject) => {
-            this.connection.query('UPDATE ToDoItems SET name = ?, active_time = NOW() WHERE id = (SELECT min_id FROM (SELECT MIN(id) AS min_id FROM ToDoItems WHERE active_time IS NULL) AS derived_table);', [name], (error, results) => {
+            this.connection.query("SELECT COUNT(*) AS count FROM ToDoItems WHERE active_time IS NULL;", (error, results) => {
                 if(error) {
-                    reject(error, false);
-                    return;
-                }
-                if(results.length == 0) {
-                    reject(error, true);
+                    reject(error);
                     return;
                 }
                 resolve(results);
             });
         });
+    }
+
+    //Create a new item by adding a new row to the table
+    makeSpace(name) {
+        console.log('No space available for new item. Making a new record.');
+        return new Promise((resolve, reject) => {
+            this.connection.query("INSERT INTO ToDoItems (name, status, active_time) VALUES (?, false, NOW());", [name], (error, results) => {
+                if(!!error) {
+                    reject(error);
+                }
+                resolve(results);
+            });
+        });
+    }
+
+    //Create a new item by overwritting a deleted one
+    fillSpace(name) {
+        console.log('Space available for new item. Changing inactive record.');
+        return new Promise((resolve, reject) => {
+            this.connection.query('UPDATE ToDoItems SET name = ?, active_time = NOW() WHERE id = (SELECT min_id FROM (SELECT MIN(id) AS min_id FROM ToDoItems WHERE active_time IS NULL) AS derived_table);', [name], (error, results) => {
+                if(!!error) {
+                    reject(error);
+                }
+                resolve(results);
+            });
+        });
+    }
+
+    // Make a new To-Do item by activating one of the slots
+    // Returns a promise with resolve(results) and reject(error)
+    newItem(name) {
+        return this.itemSpace().then(
+            (results) => {
+                console.log("Available slots: " + results[0].count);
+                if (results[0].count === 0) {
+                    return this.makeSpace(name);
+                } else {
+                    return this.fillSpace(name);
+                }
+            }
+        );
     }
 
     // Remove a To-Do item by deactivating one of the slots
