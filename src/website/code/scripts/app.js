@@ -18,13 +18,18 @@ class BoardItem {
 
     // Create HTML content for this object
     toHTML = function() {
-        return `<div id = item${this.id}>
+        return `<div id = item${this.id} class=itemDiv>
         <h2>#${this.num}: ${this.name}</h2>
-        <label for="done${this.id}">Done</label>
-        <input type="radio" id=done${this.id} name="complete${this.id}" value="true">
-        
-        <label for="notdone${this.id}">Not Done</label>
-        <input type="radio" id=notdone${this.id} name="complete${this.id}" value="false">
+        <div class=itemButtons>
+        <div class=buttonHolder>
+        <label for="done${this.id}" class=doneLabel>Done</label>
+        <input type="radio" id=done${this.id} class=doneButton name="complete${this.id}" value="true">
+        </div>
+        <div class=buttonHolder>
+        <label for="notdone${this.id}" class=notDoneLabel>Not Done</label>
+        <input type="radio" id=notdone${this.id} class=notDoneButton name="complete${this.id}" value="false">
+        </div>
+        </div>
         </div>
         `
     }
@@ -41,6 +46,7 @@ class BoardItem {
             //Reject
             (error,msg) => {
                 console.error('Could not send update: ' + msg + '\n' + error.stack);
+                connectionError();
             }
         );
     }
@@ -84,13 +90,6 @@ class BoardItem {
     }
 };
 
-// End the connection to the web socket server
-function closeConnection() {
-    if(!!ws) {
-        ws.close();
-    }
-}
-
 // Make a new item and send it to the server
 function createNew() {
     let name = prompt("Name of the new task: ");
@@ -102,6 +101,7 @@ function createNew() {
         //Reject
         (error,msg) => {
             console.error('Could not send create request: ' + msg + '\n' + error.stack);
+            connectionError();
         }
     );
 }
@@ -120,8 +120,26 @@ function deleteItem(id) {
     );
 }
 
+//What to do when unable to reach the server
+function connectionError() {
+    document.getElementById('boards').innerHTML = '<p class = error>Connection to server closed</p>';
+}
+
+//What to do if the server sends back an error
+function internalError() {
+    document.getElementById('boards').innerHTML = '<p class = error>An internal error has occurred.</p>';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    closeConnection();
+
+    let boardsHTML = document.getElementById('boards'); //The item on the page where the to do items are located
+
+    let resetting = true; //True if the client is resetting the connection so it doesn't error
+    if(!!ws) {
+        ws.close();
+    } else {
+        resetting = false;
+    }
 
     //Attempt to create the connection
     ws = new WebSocket('ws://localhost:3000');
@@ -139,12 +157,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     ws.addEventListener('close', () => {
         console.log('WebSocket connection closed');
+        if(resetting) {
+            resetting = false;
+        } else {
+            connectionError();
+        }
     });
 
     ws.addEventListener('message', (msg) => {
         console.log(`Received message: ${msg.data}`);
         let m = JSON.parse(msg.data); //The contents of the message
-        let boardsHTML = document.getElementById('boards'); //The item on the page where the to do items are located
+        
         switch(m.type){
             case ServerMessages.SENDALL:
                 // Message contains all active items.
@@ -158,15 +181,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 boardsHTML.innerHTML = '';
                 for(let i = 0; i < items.length; i++) {
                     //Initialize each board item
-                    boardsHTML.innerHTML += `<div id = item${items[i].id}>${items[i].toHTML()}</div>`;
+                    boardsHTML.innerHTML += items[i].toHTML();
                 }
+
+                //Add a 'new item' button
+                boardsHTML.innerHTML += `<button id=newButton>New Item</button>`
+
+                document.getElementById('newButton').addEventListener('click', createNew);
 
                 //Add all event handlers for buttons
                 for(let i = 0; i < items.length; i++) {
                     items[i].setupButtons();
                 }
 
-                document.getElementById("loadMsg").innerHTML = "";
                 break;
             case ServerMessages.UPDATE:
                 // Message contains the id and status for updating a To Do list item
@@ -179,17 +206,15 @@ document.addEventListener('DOMContentLoaded', function() {
             //Errors
             case ServerMessages.ERR_SETUP_RETRIEVAL:
                 // Initial setup failed
-                boardsHTML.innerHTML = '<p class = error>An internal error has prevented retrieving the To-Do list items.</p>';
-                document.getElementById("loadMsg").innerHTML = "";
+                internalError();
                 break;
             case ServerMessages.ERR_UPDATE_RETRIEVAL:
                 // Failed to update item
-                boardsHTML.innerHTML = '<p class = error>An internal error has prevented updating the To-Do list item.</p>';
+                internalError();
                 break;
             default:
                 console.error("UNRECOGNIZED WEBSOCKET MESSAGE TYPE");
                 break;
-
         }
     });
 });
