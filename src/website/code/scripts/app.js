@@ -93,6 +93,7 @@ class BoardItem {
 // Make a new item and send it to the server
 function createNew() {
     let name = prompt("Name of the new task: ");
+    console.log("Sending creation request");
     sendMessage(ws, ClientMessages.CREATE, {name: name}).then(
         //Resolve
         () => {
@@ -204,12 +205,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 break;
             //Errors
-            case ServerMessages.ERR_SETUP_RETRIEVAL:
-                // Initial setup failed
-                internalError();
-                break;
-            case ServerMessages.ERR_UPDATE_RETRIEVAL:
-                // Failed to update item
+            case ServerMessages.ERR_SETUP_RETRIEVAL: // Initial setup failed
+            case ServerMessages.ERR_UPDATE_RETRIEVAL: // Failed to update item
+            case ServerMessages.ERR_CREATION:
+            case ServerMessages.ERR_DELETION:
                 internalError();
                 break;
             default:
