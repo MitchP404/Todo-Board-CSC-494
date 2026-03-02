@@ -18,13 +18,18 @@ class BoardItem {
 
     // Create HTML content for this object
     toHTML = function() {
-        return `<div id = item${this.id}>
+        return `<div id = item${this.id} class=itemDiv>
         <h2>#${this.num}: ${this.name}</h2>
-        <label for="done${this.id}">Done</label>
-        <input type="radio" id=done${this.id} name="complete${this.id}" value="true">
-        
-        <label for="notdone${this.id}">Not Done</label>
-        <input type="radio" id=notdone${this.id} name="complete${this.id}" value="false">
+        <div class=itemButtons>
+        <div class=buttonHolder>
+        <label for="done${this.id}" class=doneLabel>Done</label>
+        <input type="radio" id=done${this.id} class=doneButton name="complete${this.id}" value="true">
+        </div>
+        <div class=buttonHolder>
+        <label for="notdone${this.id}" class=notDoneLabel>Not Done</label>
+        <input type="radio" id=notdone${this.id} class=notDoneButton name="complete${this.id}" value="false">
+        </div>
+        </div>
         </div>
         `
     }
@@ -158,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 boardsHTML.innerHTML = '';
                 for(let i = 0; i < items.length; i++) {
                     //Initialize each board item
-                    boardsHTML.innerHTML += `<div id = item${items[i].id}>${items[i].toHTML()}</div>`;
+                    boardsHTML.innerHTML += items[i].toHTML();
                 }
 
                 //Add all event handlers for buttons

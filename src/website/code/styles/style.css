@@ -1,9 +1,76 @@
-#messages {
-    height: 20em;
-    overflow: auto;
-    margin-top: 1em;
+* {
+    box-sizing: border-box;
 }
 
-.input-block {
-    margin-top: 1em;
+body {
+    background-color: #354F52;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+}
+
+h1 {
+    display: block;
+    text-align: center;
+    color: #CAD2C5;
+}
+
+#boards {
+    width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1.618rem;
+	justify-content: space-evenly;
+    padding: 0 0.3125rem 0 0.3125rem;
+}
+
+.itemDiv, .error, .loadMsg {
+    min-width: 15rem;
+    max-width: 40rem;
+    width: 100%;
+	box-shadow: 0.3125rem 0.3125rem #2F3E46;
+    border: .5rem solid #84A98C;
+    border-radius: .5rem;
+    background-color: #52796F;
+    color: #CAD2C5;
+}
+
+h2 {
+    margin: 1rem 1rem 0 1rem;
+    font-size: 1.618rem;
+}
+
+.itemButtons {
+    display: flex;
+}
+
+.buttonHolder {
+    margin: 0.618rem 0 0.618rem 0;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 50%;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+.doneLabel {
+
+}
+
+.doneButton {
+
+}
+
+.notDoneLabel {
+
+}
+
+.notDoneButton {
+
+}
+
+.loadMsg {
+
 }
