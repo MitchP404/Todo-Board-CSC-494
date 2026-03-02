@@ -67,7 +67,7 @@ class DatabaseConnector {
     // Returns a promise with resolve(results) and reject(error)
     itemSpace() {
         return new Promise((resolve, reject) => {
-            this.connection.query("SELECT COUNT(active_time) AS count FROM ToDoItems WHERE active_time IS NULL;", (error, results) => {
+            this.connection.query("SELECT COUNT(*) AS count FROM ToDoItems WHERE active_time IS NULL;", (error, results) => {
                 if(error) {
                     reject(error);
                     return;
@@ -108,6 +108,7 @@ class DatabaseConnector {
     newItem(name) {
         return this.itemSpace().then(
             (results) => {
+                console.log("Available slots: " + results[0].count);
                 if (results[0].count === 0) {
                     return this.makeSpace(name);
                 } else {

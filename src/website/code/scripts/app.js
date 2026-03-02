@@ -29,6 +29,9 @@ class BoardItem {
         <label for="notdone${this.id}" class=notDoneLabel>Not Done</label>
         <input type="radio" id=notdone${this.id} class=notDoneButton name="complete${this.id}" value="false">
         </div>
+        <div class=deleteButtonHolder>
+        <button class=deleteButton id=deleteButton${this.id}>Delete</button>
+        </div>
         </div>
         </div>
         `
@@ -82,6 +85,10 @@ class BoardItem {
         notDoneButton.addEventListener("change", () => {
             this.changeStatus(false);
         });
+
+        document.getElementById(`deleteButton${this.id}`).addEventListener("click", () => {
+            deleteItem(this.id);
+        });
     }
 
     //Convert the contents of this item to a JSON string
@@ -93,6 +100,8 @@ class BoardItem {
 // Make a new item and send it to the server
 function createNew() {
     let name = prompt("Name of the new task: ");
+    console.log(name);
+    if(name==null || name==""){ return; }
     console.log("Sending creation request");
     sendMessage(ws, ClientMessages.CREATE, {name: name}).then(
         //Resolve

@@ -45,17 +45,40 @@ h2 {
 
 .itemButtons {
     display: flex;
+    align-items: center;
 }
 
 .buttonHolder {
     margin: 0.618rem 0 0.618rem 0;
     flex-grow: 1;
-    flex-shrink: 1;
-    flex-basis: 50%;
+    flex-shrink: 0;
+    flex-basis: 2rem;
     display: flex;
     justify-content: center;
+    align-items: center;
     flex-direction: row;
     flex-wrap: nowrap;
+}
+
+.deleteButtonHolder {
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: 2rem;
+    height: 100%;
+}
+
+.deleteButton {
+    margin-top: auto;
+    border: .3125rem solid #84A98C;
+    border-radius: .5rem;
+    background-color: #52796F;
+    color: #CAD2C5;
+}
+
+.deleteButton:hover {
+    cursor: pointer;
+    border-color: #52796F;
+    background-color: #2F3E46;
 }
 
 .doneLabel {

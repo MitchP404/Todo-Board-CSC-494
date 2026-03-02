@@ -193,8 +193,37 @@ function runServer() {
                     );
                     break;
                 case ClientMessages.DELETE:
-                    console.log(`Deleting item ${m.data.id}`);
-                    //TODO: Implement
+                    console.log(`Deleting item ${m.body.id}`);
+                    dbc.removeItem(m.body.id).then(
+                        //Resolve
+                        (results) => {
+                            console.log("Deletion successful. Getting new arrays to send clients")
+                            return dbc.getItems().then(
+                                //Resolve
+                                (results) => {
+                                    console.log("Items obtained, sending...");
+                                    return sendMessageAll(wss, ServerMessages.SENDALL, results);
+                                },
+                                //Reject
+                                (error) => {
+                                    console.error("Could not obtain items: " + error.stack);
+                                    return sendMessage(ws, ServerMessages.ERR_SETUP_RETRIEVAL, {});
+                                }
+                            );
+                        },
+                        //Reject
+                        (error) => {
+                            console.error("Could not remove item: " + error.stack);
+                            return sendMessage(ws, ServerMessages.ERR_DELETION, {});
+                        }
+                    ).then(
+                        (results) => {
+                            console.log("Deletion follow-up send successful");
+                        },
+                        (error) => {
+                            console.error("Deletion follow-up send failed")
+                        }
+                    );
                     break;
                 default:
                     console.error("UNRECOGNIZED WEBSOCKET MESSAGE TYPE");
