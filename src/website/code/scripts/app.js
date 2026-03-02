@@ -1,6 +1,6 @@
-import { ServerMessages, ClientMessages, Message } from "../common/Message.js"
+import { ServerMessages, ClientMessages, sendMessage } from "../common/Message.js"
 
-let ws; //Our WebSocket connection to the server
+var ws; //Our WebSocket connection to the server
 
 // A single item on the board
 class BoardItem {
@@ -29,17 +29,30 @@ class BoardItem {
         `
     }
 
-    // Update whether or not this item is complete
-    updateStatus(complete) {
-        console.log(`Updating item ${this.id} status: ${complete}. Sending message...`);
-        m = new Message(ws, ServerMessages.SENDALL, results, (error) => {
-                if(!!error) {
-                    console.error(error);
-                } else {
-                    console.log("Update message sent");
-                }
-        });
-        m.send();
+    // Attempt to change whether or not this item is complete
+    changeStatus(complete) {
+        const b = {id: this.id, status: complete};
+        console.log(`Updating item ${this.id} status: ${complete}. Sending message with body: ${JSON.stringify(b)}`);
+        sendMessage(ws, ClientMessages.UPDATE, b).then(
+            //Resolve
+            () => {
+                console.log('Update sent');
+            },
+            //Reject
+            (error,msg) => {
+                console.error('Could not send update: ' + msg + '\n' + error.stack);
+            }
+        );
+    }
+
+    // Update this items status after having been told to do so by the server
+    updateStatus(status) {
+        this.complete = status;
+        if(status == true) {
+            document.getElementById(`done${this.id}`).checked = true;
+        } else {
+            document.getElementById(`notdone${this.id}`).checked = true;
+        }
     }
 
     // Setup the buttons on a newly created BoardItem with its HTML already in the webpage
@@ -57,11 +70,11 @@ class BoardItem {
 
         // Add event listeners to the buttons
         doneButton.addEventListener("change", () => {
-            this.updateStatus(true);
+            this.changeStatus(true);
         });
         
         notDoneButton.addEventListener("change", () => {
-            this.updateStatus(false);
+            this.changeStatus(false);
         });
     }
 
@@ -81,8 +94,8 @@ document.addEventListener('DOMContentLoaded', function() {
     closeConnection();
 
     //Attempt to create the connection
-    var ws = new WebSocket('ws://localhost:3000');
-    
+    ws = new WebSocket('ws://localhost:3000');
+
     //An array containing the items on the board
     let items = [];
 
@@ -125,13 +138,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 document.getElementById("loadMsg").innerHTML = "";
                 break;
+            case ServerMessages.UPDATE:
+                // Message contains the id and status for updating a To Do list item
+                for (let i = 0; i < items.length; i++) {
+                    if(items[i].id == m.body.id) {
+                        items[i].updateStatus(m.body.status);
+                    }
+                }
+                break;
             //Errors
             case ServerMessages.ERR_SETUP_RETRIEVAL:
                 // Initial setup failed
-                boardsHTML.innerHTML = '<p class = setup_error>An internal error has prevented retrieving the To-Do list items.</p>';
+                boardsHTML.innerHTML = '<p class = error>An internal error has prevented retrieving the To-Do list items.</p>';
                 document.getElementById("loadMsg").innerHTML = "";
                 break;
-                
+            case ServerMessages.ERR_UPDATE_RETRIEVAL:
+                // Failed to update item
+                boardsHTML.innerHTML = '<p class = error>An internal error has prevented updating the To-Do list item.</p>';
+                break;
             default:
                 console.error("UNRECOGNIZED WEBSOCKET MESSAGE TYPE");
                 break;

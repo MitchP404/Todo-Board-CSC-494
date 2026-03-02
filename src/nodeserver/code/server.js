@@ -5,7 +5,7 @@
 const DatabaseConnector = require('./DatabaseConnector.js');
 const express = require('express');
 const { WebSocket, WebSocketServer } = require('ws');
-const { ServerMessages, ClientMessages, Message } = require('../../common/Message.js');
+const { ServerMessages, ClientMessages, sendMessage, sendMessageAll } = require('../../common/Message.js');
 
 const app = express(); //Initialize an express server
 const port = /*process.env.PORT ||*/ 3000; // Use either the PORT environment variable or port 3000
@@ -108,19 +108,21 @@ function runServer() {
             //Resolve
             (results) => {
                 console.log("Items obtained, sending...");
-                m = new Message(ws, ServerMessages.SENDALL, results, (error) => {
-                    if(!!error) {
-                        console.log(error);
-                    } else {
-                        console.log("Items sent.");
-                    }
-                });
-                m.send();
+                return sendMessage(ws, ServerMessages.SENDALL, results);
             },
             //Reject
             (error) => {
                 console.error("Could not obtain items: " + error.stack);
-                ws.emit("ITEM RETRIEVAL ERROR");
+                return sendMessage(ws, ServerMessages.ERR_SETUP_RETRIEVAL, {});
+            }
+        ).then(
+            //Resolve
+            () => {
+                console.log("Item Retrieval Message Sent");
+            },
+            //Reject
+            (error, msg) => {
+                console.error("Failed to send item retrieval message: " + msg + '\n' + error.stack );
             }
         );
 
@@ -130,24 +132,37 @@ function runServer() {
         //ws.on('pong', heartbeat);
 
         //Set what to do when a message is received
-        ws.on('message', (msg, isBinary) => {
-            /*
-            console.log(`Received message: ${msg.data}`);
-            let m = JSON.parse(msg.data); //The contents of the message
-            let boardsHTML = document.getElementById('boards'); //The item on the page where the to do items are located
+        ws.on('message', (data) => {
+            console.log(`Received message: ${data}`);
+            let m = JSON.parse(data); //The contents of the message
             switch(m.type){
                 case ClientMessages.UPDATE:
-                    
+                    console.log("Updating " + m.body.id + " to status " + m.body.status);
+                    dbc.updateStatus(m.body.id, m.body.status).then(
+                        //Resolve
+                        (results) => {
+                            console.log("Update successful. Sending update ")
+                            return sendMessageAll(wss, ServerMessages.UPDATE, {id: m.body.id, status: m.body.status});
+                        },
+                        //Reject
+                        (error) => {
+                            return sendMessage(ws, ServerMessages.ERR_UPDATE_RETRIEVAL, {});
+                        }
+                    ).then(
+                        //Resolve
+                        () => {
+                            console.log("Item update message sent");
+                        },
+                        //Reject
+                        (error) => {
+                            console.error("Failed to send item update message: " + msg + '\n' + error.stack);
+                        }
+                    );
                     break;
-                //Errors
-                case ServerMessages.ERR_SETUP_RETRIEVAL:
-                    
-                    break;
-                    
                 default:
                     console.error("UNRECOGNIZED WEBSOCKET MESSAGE TYPE");
                     break;
-            */
+            }
             //Example of how to send data to each open client
             /*
             wss.clients.forEach((client) => {
