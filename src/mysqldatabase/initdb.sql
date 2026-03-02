@@ -1,0 +1,8 @@
+CREATE DATABASE ToDoBoardData;
+USE ToDoBoardData;
+CREATE TABLE IF NOT EXISTS ToDoItems(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    status BOOL,
+    active_time DATETIME
+);

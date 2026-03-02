@@ -41,7 +41,9 @@ services:
   # Once properly set up, use the information in docs/DatabaseDesign.md
   #   initialize the database
   db:
-    image: mysql:latest
+    build: ./src/mysqldatabase
+    stdin_open: true #Keep the container's standard input open for shell prompts
+    tty: true #Set up a virtual terminal inside the container
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: testytests
